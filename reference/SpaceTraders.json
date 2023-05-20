@@ -382,6 +382,41 @@
         ]
       }
     },
+    "/systems.json": {
+      "get": {
+        "description": "Return a json file containing all systems",
+        "operationId": "get-systems-all",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../models/System.json",
+                    "x-stoplight": {
+                      "id": "kd527rrsmw7rb"
+                    }
+                  }
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "AgentToken": []
+          }
+        ],
+        "summary": "Get All Systems",
+        "tags": [
+          "systems"
+        ],
+        "parameters": []
+      },
+      "parameters": []
+    },
     "/systems/{systemSymbol}": {
       "get": {
         "description": "Get the details of a system.",
@@ -1027,6 +1062,17 @@
         "summary": "Accept Contract",
         "tags": [
           "contracts"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "in": "header",
+            "name": "content-length",
+            "required": true
+          }
         ]
       }
     },
@@ -1170,6 +1216,17 @@
         "summary": "Fulfill Contract",
         "tags": [
           "contracts"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "default": "0"
+            },
+            "in": "header",
+            "name": "content-length",
+            "required": true
+          }
         ]
       }
     },
@@ -1444,7 +1501,7 @@
                 }
               }
             },
-            "description": "The ship has successfully moved into orbit at it's current location."
+            "description": "The ship has successfully moved into orbit at its current location."
           }
         },
         "security": [
@@ -1455,6 +1512,17 @@
         "summary": "Orbit Ship",
         "tags": [
           "fleet"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "in": "header",
+            "name": "content-length",
+            "required": true
+          }
         ]
       }
     },
@@ -1631,6 +1699,17 @@
         "summary": "Create Chart",
         "tags": [
           "fleet"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "in": "header",
+            "name": "content-length",
+            "required": true
+          }
         ]
       }
     },
@@ -1736,6 +1815,17 @@
         "summary": "Dock Ship",
         "tags": [
           "fleet"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "number",
+              "default": 0
+            },
+            "in": "header",
+            "name": "content-length",
+            "required": true
+          }
         ]
       }
     },
@@ -1797,6 +1887,17 @@
         "summary": "Create Survey",
         "tags": [
           "fleet"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "in": "header",
+            "name": "content-length",
+            "required": true
+          }
         ]
       }
     },
@@ -2422,6 +2523,17 @@
         "summary": "Scan Systems",
         "tags": [
           "fleet"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "in": "header",
+            "name": "content-length",
+            "required": true
+          }
         ]
       }
     },
@@ -2544,6 +2656,17 @@
         "summary": "Scan Ships",
         "tags": [
           "fleet"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "number",
+              "default": 0
+            },
+            "in": "header",
+            "name": "content-length",
+            "required": true
+          }
         ]
       }
     },
@@ -2606,6 +2729,17 @@
         "summary": "Refuel Ship",
         "tags": [
           "fleet"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "in": "header",
+            "name": "content-length",
+            "required": true
+          }
         ]
       }
     },
