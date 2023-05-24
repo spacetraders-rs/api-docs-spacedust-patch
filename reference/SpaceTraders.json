@@ -2546,6 +2546,15 @@
           "schema": {
             "type": "string"
           }
+        },
+        {
+          "schema": {
+            "type": "integer",
+            "default": 0
+          },
+          "in": "header",
+          "name": "content-length",
+          "required": true
         }
       ],
       "post": {
