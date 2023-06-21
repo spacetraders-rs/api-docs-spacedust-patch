@@ -1,6 +1,5 @@
 {
   "type": "object",
-  "description": "Results of a transaction with a shipyard.",
   "properties": {
     "waypointSymbol": {
       "type": "string",
@@ -8,16 +7,16 @@
     },
     "shipSymbol": {
       "type": "string",
-      "description": "The symbol of the ship that was the subject of the transaction."
+      "description": "The symbol of the ship that made the transaction."
     },
-    "price": {
-      "type": "integer",
-      "description": "The price of the transaction.",
-      "minimum": 0
-    },
-    "agentSymbol": {
+    "tradeSymbol": {
       "type": "string",
-      "description": "The symbol of the agent that made the transaction."
+      "description": "The symbol of the trade good."
+    },
+    "totalPrice": {
+      "type": "integer",
+      "description": "The total price of the transaction.",
+      "minimum": 0
     },
     "timestamp": {
       "type": "string",
@@ -28,8 +27,9 @@
   "required": [
     "waypointSymbol",
     "shipSymbol",
-    "price",
-    "agentSymbol",
+    "tradeSymbol",
+    "totalPrice",
     "timestamp"
-  ]
+  ],
+  "description": "Result of a transaction for a ship modification, such as installing a mount or a module."
 }
