@@ -1,14 +1,14 @@
 {
-  "description": "Extraction details.",
+  "description": "Siphon details.",
   "type": "object",
   "properties": {
     "shipSymbol": {
       "type": "string",
       "minLength": 1,
-      "description": "Symbol of the ship that executed the extraction."
+      "description": "Symbol of the ship that executed the siphon."
     },
     "yield": {
-      "$ref": "./ExtractionYield.json"
+      "$ref": "./SiphonYield.json"
     }
   },
   "required": [

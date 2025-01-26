@@ -3,10 +3,14 @@
   "description": "Results of a transaction with a shipyard.",
   "properties": {
     "waypointSymbol": {
-      "type": "string",
-      "description": "The symbol of the waypoint where the transaction took place."
+      "$ref": "./WaypointSymbol.json"
     },
     "shipSymbol": {
+      "type": "string",
+      "deprecated": true,
+      "description": "The symbol of the ship that was the subject of the transaction."
+    },
+    "shipType": {
       "type": "string",
       "description": "The symbol of the ship that was the subject of the transaction."
     },
@@ -28,6 +32,7 @@
   "required": [
     "waypointSymbol",
     "shipSymbol",
+    "shipType",
     "price",
     "agentSymbol",
     "timestamp"

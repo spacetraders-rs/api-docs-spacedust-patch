@@ -3,8 +3,7 @@
   "type": "object",
   "properties": {
     "symbol": {
-      "$ref": "./FactionSymbols.json",
-      "description": "Faction symbol."
+      "$ref": "./FactionSymbol.json"
     },
     "name": {
       "type": "string",

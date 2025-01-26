@@ -79,7 +79,7 @@
                     },
                     "resetDate": {
                       "type": "string",
-                      "description": "The date and time when the game server was last reset."
+                      "description": "The date when the game server was last reset."
                     },
                     "description": {
                       "type": "string"
@@ -254,8 +254,7 @@
               "schema": {
                 "properties": {
                   "faction": {
-                    "$ref": "../models/FactionSymbols.json",
-                    "example": "COSMIC"
+                    "$ref": "../models/FactionSymbol.json"
                   },
                   "symbol": {
                     "description": "Your desired agent symbol. This will be a unique name used to represent your agent, and will be the prefix for your ships.",
@@ -537,6 +536,32 @@
             "in": "query",
             "name": "limit",
             "description": "How many entries to return per page"
+          },
+          {
+            "description": "Filter waypoints by type.",
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "$ref": "../models/WaypointType.json"
+            }
+          },
+          {
+            "description": "Filter waypoints by one or more traits.",
+            "in": "query",
+            "name": "traits",
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "../models/WaypointTraitSymbol.json"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../models/WaypointTraitSymbol.json"
+                  }
+                }
+              ]
+            }
           }
         ],
         "security": [
@@ -730,7 +755,7 @@
     },
     "/systems/{systemSymbol}/waypoints/{waypointSymbol}/jump-gate": {
       "get": {
-        "description": "Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.\n\nThe response will return all systems that are have a Jump Gate in range of this Jump Gate. Those systems can be jumped to from this Jump Gate.",
+        "description": "Get jump gate details for a waypoint. Requires a waypoint of type `JUMP_GATE` to use.\n\nWaypoints connected to this jump gate can be ",
         "operationId": "get-jump-gate",
         "responses": {
           "200": {
@@ -760,6 +785,160 @@
           }
         ],
         "summary": "Get Jump Gate",
+        "tags": [
+          "Systems"
+        ]
+      },
+      "parameters": [
+        {
+          "description": "The system symbol",
+          "in": "path",
+          "name": "systemSymbol",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "description": "The waypoint symbol",
+          "in": "path",
+          "name": "waypointSymbol",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/systems/{systemSymbol}/waypoints/{waypointSymbol}/construction": {
+      "get": {
+        "description": "Get construction details for a waypoint. Requires a waypoint with a property of `isUnderConstruction` to be true.",
+        "operationId": "get-construction",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "properties": {
+                    "data": {
+                      "$ref": "../models/Construction.json"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successfully fetched construction site."
+          }
+        },
+        "security": [
+          {},
+          {
+            "AgentToken": []
+          }
+        ],
+        "summary": "Get Construction Site",
+        "tags": [
+          "Systems"
+        ]
+      },
+      "parameters": [
+        {
+          "description": "The system symbol",
+          "in": "path",
+          "name": "systemSymbol",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "description": "The waypoint symbol",
+          "in": "path",
+          "name": "waypointSymbol",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/systems/{systemSymbol}/waypoints/{waypointSymbol}/construction/supply": {
+      "post": {
+        "description": "Supply a construction site with the specified good. Requires a waypoint with a property of `isUnderConstruction` to be true.\n\nThe good must be in your ship's cargo. The good will be removed from your ship's cargo and added to the construction site's materials.",
+        "operationId": "supply-construction",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "shipSymbol": {
+                    "type": "string",
+                    "description": "Symbol of the ship to use."
+                  },
+                  "tradeSymbol": {
+                    "type": "string",
+                    "description": "The symbol of the good to supply."
+                  },
+                  "units": {
+                    "type": "integer",
+                    "description": "Amount of units to supply."
+                  }
+                },
+                "required": [
+                  "shipSymbol",
+                  "tradeSymbol",
+                  "units"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": ""
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "properties": {
+                    "data": {
+                      "properties": {
+                        "construction": {
+                          "$ref": "../models/Construction.json"
+                        },
+                        "cargo": {
+                          "$ref": "../models/ShipCargo.json"
+                        }
+                      },
+                      "required": [
+                        "construction",
+                        "cargo"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successfully supplied construction site."
+          }
+        },
+        "security": [
+          {
+            "AgentToken": []
+          }
+        ],
+        "summary": "Supply Construction Site",
         "tags": [
           "Systems"
         ]
@@ -925,6 +1104,120 @@
         "summary": "Get Agent",
         "tags": [
           "Agents"
+        ]
+      }
+    },
+    "/agents": {
+      "get": {
+        "description": "Fetch agents details.",
+        "operationId": "get-agents",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "../models/Agent.json"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "$ref": "../models/Meta.json"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successfully fetched agents details."
+          }
+        },
+        "summary": "List Agents",
+        "tags": [
+          "Agents"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "in": "query",
+            "name": "page",
+            "description": "What entry offset to request"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 10
+            },
+            "in": "query",
+            "name": "limit",
+            "description": "How many entries to return per page"
+          }
+        ],
+        "security": [
+          {},
+          {
+            "AgentToken": []
+          }
+        ]
+      }
+    },
+    "/agents/{agentSymbol}": {
+      "get": {
+        "description": "Fetch agent details.",
+        "operationId": "get-agent",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "$ref": "../models/Agent.json"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successfully fetched agent details."
+          }
+        },
+        "summary": "Get Public Agent",
+        "tags": [
+          "Agents"
+        ],
+        "parameters": [
+          {
+            "description": "The agent symbol",
+            "in": "path",
+            "name": "agentSymbol",
+            "required": true,
+            "schema": {
+              "default": "FEBA66",
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {},
+          {
+            "AgentToken": []
+          }
         ]
       }
     },
@@ -1614,7 +1907,11 @@
                                 "type": "integer",
                                 "description": "Amount of units of the good."
                               }
-                            }
+                            },
+                            "required": [
+                              "tradeSymbol",
+                              "units"
+                            ]
                           }
                         },
                         "consumed": {
@@ -1631,7 +1928,11 @@
                                 "type": "integer",
                                 "description": "Amount of units of the good."
                               }
-                            }
+                            },
+                            "required": [
+                              "tradeSymbol",
+                              "units"
+                            ]
                           }
                         }
                       }
@@ -1896,7 +2197,7 @@
         }
       ],
       "post": {
-        "description": "Extract resources from a waypoint that can be extracted, such as asteroid fields, into your ship. Send an optional survey as the payload to target specific yields.\n\nThe ship must be in orbit to be able to extract and must have mining equipments installed that can extract goods, such as the `Gas Siphon` mount for gas-based goods or `Mining Laser` mount for ore-based goods.",
+        "description": "Extract resources from a waypoint that can be extracted, such as asteroid fields, into your ship. Send an optional survey as the payload to target specific yields.\n\nThe ship must be in orbit to be able to extract and must have mining equipments installed that can extract goods, such as the `Gas Siphon` mount for gas-based goods or `Mining Laser` mount for ore-based goods.\n\nThe survey property is now deprecated. See the `extract/survey` endpoint for more details.",
         "operationId": "extract-resources",
         "requestBody": {
           "content": {
@@ -1904,6 +2205,7 @@
               "schema": {
                 "properties": {
                   "survey": {
+                    "deprecated": true,
                     "$ref": "../models/Survey.json"
                   }
                 },
@@ -1929,12 +2231,23 @@
                         },
                         "cargo": {
                           "$ref": "../models/ShipCargo.json"
+                        },
+                        "events": {
+                          "type": "array",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "$ref": "../models/ShipConditionEvent.json"
+                              }
+                            ]
+                          }
                         }
                       },
                       "required": [
                         "extraction",
                         "cooldown",
-                        "cargo"
+                        "cargo",
+                        "events"
                       ],
                       "type": "object"
                     }
@@ -1955,6 +2268,163 @@
           }
         ],
         "summary": "Extract Resources",
+        "tags": [
+          "Fleet"
+        ]
+      }
+    },
+    "/my/ships/{shipSymbol}/siphon": {
+      "parameters": [
+        {
+          "description": "The ship symbol.",
+          "in": "path",
+          "name": "shipSymbol",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "description": "Siphon gases, such as hydrocarbon, from gas giants.\n\nThe ship must be in orbit to be able to siphon and must have siphon mounts and a gas processor installed.",
+        "operationId": "siphon-resources",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "properties": {
+                    "data": {
+                      "properties": {
+                        "cooldown": {
+                          "$ref": "../models/Cooldown.json"
+                        },
+                        "siphon": {
+                          "$ref": "../models/Siphon.json"
+                        },
+                        "cargo": {
+                          "$ref": "../models/ShipCargo.json"
+                        },
+                        "events": {
+                          "type": "array",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "$ref": "../models/ShipConditionEvent.json"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "siphon",
+                        "cooldown",
+                        "cargo",
+                        "events"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Siphon successful."
+          }
+        },
+        "security": [
+          {
+            "AgentToken": []
+          }
+        ],
+        "summary": "Siphon Resources",
+        "tags": [
+          "Fleet"
+        ]
+      }
+    },
+    "/my/ships/{shipSymbol}/extract/survey": {
+      "parameters": [
+        {
+          "description": "The ship symbol.",
+          "in": "path",
+          "name": "shipSymbol",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "description": "Use a survey when extracting resources from a waypoint. This endpoint requires a survey as the payload, which allows your ship to extract specific yields.\n\nSend the full survey object as the payload which will be validated according to the signature. If the signature is invalid, or any properties of the survey are changed, the request will fail.",
+        "operationId": "extract-resources-with-survey",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/Survey.json"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "properties": {
+                    "data": {
+                      "properties": {
+                        "cooldown": {
+                          "$ref": "../models/Cooldown.json"
+                        },
+                        "extraction": {
+                          "$ref": "../models/Extraction.json"
+                        },
+                        "cargo": {
+                          "$ref": "../models/ShipCargo.json"
+                        },
+                        "events": {
+                          "type": "array",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "$ref": "../models/ShipConditionEvent.json"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "extraction",
+                        "cooldown",
+                        "cargo",
+                        "events"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Extracted successfully."
+          }
+        },
+        "security": [
+          {
+            "AgentToken": []
+          }
+        ],
+        "summary": "Extract Resources with Survey",
         "tags": [
           "Fleet"
         ]
@@ -2051,20 +2521,20 @@
         }
       ],
       "post": {
-        "description": "Jump your ship instantly to a target system. The ship must be in orbit to use this function. When used while in orbit of a Jump Gate waypoint, any ship can use this command, jumping to the target system's Jump Gate waypoint.\n\nWhen used elsewhere, jumping requires the ship to have a `Jump Drive` module installed and consumes a unit of antimatter from the ship's cargo. The command will fail if there is no antimatter to consume. When jumping via the `Jump Drive` module, the ship ends up at its largest source of energy in the system, such as a gas planet or a jump gate.",
+        "description": "Jump your ship instantly to a target connected waypoint. The ship must be in orbit to execute a jump.\n\nA unit of antimatter is purchased and consumed from the market when jumping. The price of antimatter is determined by the market and is subject to change. A ship can only jump to connected waypoints",
         "operationId": "jump-ship",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "properties": {
-                  "systemSymbol": {
-                    "description": "The system symbol to jump to.",
+                  "waypointSymbol": {
+                    "description": "The symbol of the waypoint to jump to. The destination must be a connected waypoint.",
                     "type": "string"
                   }
                 },
                 "required": [
-                  "systemSymbol"
+                  "waypointSymbol"
                 ],
                 "type": "object"
               }
@@ -2080,16 +2550,24 @@
                   "properties": {
                     "data": {
                       "properties": {
+                        "nav": {
+                          "$ref": "../models/ShipNav.json"
+                        },
                         "cooldown": {
                           "$ref": "../models/Cooldown.json"
                         },
-                        "nav": {
-                          "$ref": "../models/ShipNav.json"
+                        "transaction": {
+                          "$ref": "../models/MarketTransaction.json"
+                        },
+                        "agent": {
+                          "$ref": "../models/Agent.json"
                         }
                       },
                       "required": [
                         "nav",
-                        "cooldown"
+                        "cooldown",
+                        "transaction",
+                        "agent"
                       ],
                       "type": "object"
                     }
@@ -2163,11 +2641,22 @@
                         },
                         "nav": {
                           "$ref": "../models/ShipNav.json"
+                        },
+                        "events": {
+                          "type": "array",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "$ref": "../models/ShipConditionEvent.json"
+                              }
+                            ]
+                          }
                         }
                       },
                       "required": [
                         "nav",
-                        "fuel"
+                        "fuel",
+                        "events"
                       ],
                       "type": "object"
                     }
@@ -2665,6 +3154,11 @@
                     "description": "The amount of fuel to fill in the ship's tanks. When not specified, the ship will be refueled to its maximum fuel capacity. If the amount specified is greater than the ship's remaining capacity, the ship will only be refueled to its maximum fuel capacity. The amount specified is not in market units but in ship fuel units.",
                     "example": "100",
                     "minimum": 1
+                  },
+                  "fromCargo": {
+                    "type": "boolean",
+                    "description": "Wether to use the FUEL thats in your cargo or not. Default: false",
+                    "example": false
                   }
                 }
               }
@@ -2902,7 +3396,7 @@
         }
       ],
       "post": {
-        "description": "Negotiate a new contract with the HQ.\n\nIn order to negotiate a new contract, an agent must not have ongoing or offered contracts over the allowed maximum amount. Currently the maximum contracts an agent can have at a time is 1.\n\nOnce a contract is negotiated, it is added to the list of contracts offered to the agent, which the agent can then accept. \n\nThe ship must be present at a faction's HQ waypoint to negotiate a contract with that faction.",
+        "description": "Negotiate a new contract with the HQ.\n\nIn order to negotiate a new contract, an agent must not have ongoing or offered contracts over the allowed maximum amount. Currently the maximum contracts an agent can have at a time is 1.\n\nOnce a contract is negotiated, it is added to the list of contracts offered to the agent, which the agent can then accept. \n\nThe ship must be present at any waypoint with a faction present to negotiate a contract with that faction.",
         "operationId": "negotiateContract",
         "responses": {
           "201": {
@@ -3170,6 +3664,216 @@
           }
         ],
         "summary": "Remove Mount",
+        "tags": [
+          "Fleet"
+        ]
+      }
+    },
+    "/my/ships/{shipSymbol}/scrap": {
+      "parameters": [
+        {
+          "description": "The ship symbol.",
+          "in": "path",
+          "name": "shipSymbol",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "x-preview-feature": true,
+        "description": "Get the amount of value that will be returned when scrapping a ship.",
+        "operationId": "get-scrap-ship",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "properties": {
+                    "data": {
+                      "properties": {
+                        "transaction": {
+                          "$ref": "../models/ScrapTransaction.json"
+                        }
+                      },
+                      "required": [
+                        "transaction"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successfully retrieved the amount of value that will be returned when scrapping a ship."
+          }
+        },
+        "security": [
+          {
+            "AgentToken": []
+          }
+        ],
+        "summary": "Get Scrap Ship",
+        "tags": [
+          "Fleet"
+        ]
+      },
+      "post": {
+        "x-preview-feature": true,
+        "description": "Scrap a ship, removing it from the game and returning a portion of the ship's value to the agent. The ship must be docked in a waypoint that has the `Shipyard` trait in order to use this function. To preview the amount of value that will be returned, use the Get Ship action.",
+        "operationId": "scrap-ship",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "properties": {
+                    "data": {
+                      "properties": {
+                        "agent": {
+                          "$ref": "../models/Agent.json"
+                        },
+                        "transaction": {
+                          "$ref": "../models/ScrapTransaction.json"
+                        }
+                      },
+                      "required": [
+                        "agent",
+                        "transaction"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Ship scrapped successfully."
+          }
+        },
+        "security": [
+          {
+            "AgentToken": []
+          }
+        ],
+        "summary": "Scrap Ship",
+        "tags": [
+          "Fleet"
+        ]
+      }
+    },
+    "/my/ships/{shipSymbol}/repair": {
+      "parameters": [
+        {
+          "description": "The ship symbol.",
+          "in": "path",
+          "name": "shipSymbol",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "x-preview-feature": true,
+        "description": "Get the cost of repairing a ship.",
+        "operationId": "get-repair-ship",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "properties": {
+                    "data": {
+                      "properties": {
+                        "transaction": {
+                          "$ref": "../models/RepairTransaction.json"
+                        }
+                      },
+                      "required": [
+                        "transaction"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successfully retrieved the cost of repairing a ship."
+          }
+        },
+        "security": [
+          {
+            "AgentToken": []
+          }
+        ],
+        "summary": "Get Repair Ship",
+        "tags": [
+          "Fleet"
+        ]
+      },
+      "post": {
+        "x-preview-feature": true,
+        "description": "Repair a ship, restoring the ship to maximum condition. The ship must be docked at a waypoint that has the `Shipyard` trait in order to use this function. To preview the cost of repairing the ship, use the Get action.",
+        "operationId": "repair-ship",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "properties": {
+                    "data": {
+                      "properties": {
+                        "agent": {
+                          "$ref": "../models/Agent.json"
+                        },
+                        "ship": {
+                          "$ref": "../models/Ship.json"
+                        },
+                        "transaction": {
+                          "$ref": "../models/RepairTransaction.json"
+                        }
+                      },
+                      "required": [
+                        "agent",
+                        "ship",
+                        "transaction"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Ship repaired successfully."
+          }
+        },
+        "security": [
+          {
+            "AgentToken": []
+          }
+        ],
+        "summary": "Repair Ship",
         "tags": [
           "Fleet"
         ]

@@ -1,13 +1,13 @@
 {
   "type": "object",
-  "description": "A yield from the extraction operation.",
+  "description": "A yield from the siphon operation.",
   "properties": {
     "symbol": {
       "$ref": "./TradeSymbol.json"
     },
     "units": {
       "type": "integer",
-      "description": "The number of units extracted that were placed into the ship's cargo hold."
+      "description": "The number of units siphoned that were placed into the ship's cargo hold."
     }
   },
   "required": [

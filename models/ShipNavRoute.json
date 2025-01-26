@@ -5,7 +5,7 @@
     "destination": {
       "$ref": "./ShipNavRouteWaypoint.json"
     },
-    "departure": {
+    "origin": {
       "$ref": "./ShipNavRouteWaypoint.json"
     },
     "departureTime": {
@@ -22,6 +22,7 @@
   "required": [
     "destination",
     "departure",
+    "origin",
     "departureTime",
     "arrival"
   ]

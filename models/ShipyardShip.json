@@ -11,6 +11,12 @@
     "description": {
       "type": "string"
     },
+    "supply": {
+      "$ref": "./SupplyLevel.json"
+    },
+    "activity": {
+      "$ref": "./ActivityLevel.json"
+    },
     "purchasePrice": {
       "type": "integer"
     },
@@ -34,17 +40,35 @@
       "items": {
         "$ref": "./ShipMount.json"
       }
+    },
+    "crew": {
+      "type": "object",
+      "properties": {
+        "required": {
+          "type": "integer"
+        },
+        "capacity": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "required",
+        "capacity"
+      ]
     }
   },
   "required": [
+    "type",
     "symbol",
     "name",
     "description",
+    "supply",
     "purchasePrice",
     "frame",
     "reactor",
     "engine",
     "modules",
-    "mounts"
+    "mounts",
+    "crew"
   ]
 }
